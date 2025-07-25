@@ -99,7 +99,7 @@ namespace XML
                     //skip
                     position += bytesRead;
                 }
-                else if (char.IsLetterOrDigit(c) || !(char.IsWhiteSpace(c) || c == (char)65279))
+                else if (char.IsLetterOrDigit(c) || !SharedFunctions.IsWhiteSpace(c))
                 {
                     int start = position;
                     position += bytesRead;
@@ -113,7 +113,7 @@ namespace XML
                         }
                         else if (insideNode)
                         {
-                            if (char.IsWhiteSpace(c) || c == '=' || c == Token.Close || c == Token.Slash)
+                            if (SharedFunctions.IsWhiteSpace(c) || c == '=' || c == Token.Close || c == Token.Slash)
                             {
                                 token = new Token(start, position - start, Token.Type.Text);
                                 return true;
