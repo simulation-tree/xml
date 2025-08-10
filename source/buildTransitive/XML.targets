@@ -3,7 +3,7 @@
 
     <ItemGroup>
         <Reference Include="XML">
-            <HintPath>$(MSBuildThisFileDirectory)..\lib\net9.0\$(Configuration)\XML.dll</HintPath>
+            <HintPath>$(MSBuildThisFileDirectory)..\lib\$(TargetFramework)\$(Configuration)\XML.dll</HintPath>
         </Reference>
     </ItemGroup>
 
