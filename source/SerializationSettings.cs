@@ -103,7 +103,12 @@ namespace XML
             /// <summary>
             /// Nodes that start and close but don't contain any text or attributes will be omitted.
             /// </summary>
-            SkipEmptyNodes = 8
+            SkipEmptyNodes = 8,
+
+            /// <summary>
+            /// A space added before the closing > token.
+            /// </summary>
+            SpaceBeforeClosingNode = 16,
         }
     }
 }

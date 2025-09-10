@@ -11,7 +11,7 @@ namespace XML
     public readonly struct XMLAttribute : IDisposable
     {
         //todo: maybe these could be both in 1 Text value, and then a int field to describe the length of the name?
-        //this would reduce allocation count
+        //this would reduce allocation count. but then they individually couldnt be borrowed.
         private readonly Text name;
         private readonly Text value;
 
@@ -95,10 +95,10 @@ namespace XML
         /// </summary>
         public readonly void ToString(Text destination)
         {
-            destination.Append(Name);
+            destination.Append(name.AsSpan());
             destination.Append('=');
             destination.Append('"');
-            destination.Append(Value);
+            destination.Append(value.AsSpan());
             destination.Append('"');
         }
     }

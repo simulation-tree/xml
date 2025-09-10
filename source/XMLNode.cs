@@ -407,7 +407,7 @@ namespace XML
                 destination.Append(Token.Prologue);
             }
 
-            destination.Append(Name);
+            destination.Append(name.AsSpan());
 
             Span<XMLAttribute> attributesSpan = attributes.AsSpan();
             for (int i = 0; i < attributesSpan.Length; i++)
@@ -430,7 +430,7 @@ namespace XML
                 }
 
                 destination.Append(Token.Close);
-                destination.Append(Content);
+                destination.Append(content.AsSpan());
                 if (childrenSpan.Length > 0)
                 {
                     for (int c = 0; c < childrenSpan.Length; c++)
@@ -469,12 +469,20 @@ namespace XML
                 {
                     destination.Append(Token.Open);
                     destination.Append(Token.Slash);
-                    destination.Append(Name);
+                    destination.Append(name.AsSpan());
                     destination.Append(Token.Close);
                 }
             }
             else
             {
+                if (attributesSpan.Length > 0)
+                {
+                    if ((settings.flags & SerializationSettings.Flags.SpaceBeforeClosingNode) == SerializationSettings.Flags.SpaceBeforeClosingNode)
+                    {
+                        destination.Append(' ');
+                    }
+                }
+
                 destination.Append(Token.Slash);
                 destination.Append(Token.Close);
             }
