@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>Serialization.Tests</RootNamespace>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -38,10 +38,6 @@
     <ProjectReference Include="..\source\XML.csproj" />
     <ProjectReference Include="..\..\unmanaged\core\Unmanaged.Core.csproj" />
     <ProjectReference Include="..\..\unmanaged\generator\Unmanaged.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Analyzer Include="..\..\unmanaged\generator\bin\$(Configuration)\netstandard2.0\Unmanaged.Generator.dll" />
   </ItemGroup>
 
   <ItemGroup>
