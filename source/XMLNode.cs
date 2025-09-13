@@ -849,7 +849,12 @@ namespace XML
         /// <inheritdoc/>
         public readonly override int GetHashCode()
         {
-            return HashCode.Combine(name, attributes, content, children);
+            int hash = 17;
+            hash = hash * 31 + name.GetHashCode();
+            hash = hash * 31 + attributes.GetHashCode();
+            hash = hash * 31 + content.GetHashCode();
+            hash = hash * 31 + children.GetHashCode();
+            return hash;
         }
 
         /// <summary>
