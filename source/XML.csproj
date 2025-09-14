@@ -17,6 +17,7 @@
     <OutDir>bin/$(TargetFramework)/$(Configuration)</OutDir>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageId>SimulationTree.XML</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
