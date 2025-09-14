@@ -109,8 +109,8 @@ namespace Serialization.Tests
         {
             using ByteReader reader = ByteReader.CreateFromUTF8(XMLDummy);
             using XMLNode projectXml = reader.ReadObject<XMLNode>();
-            projectXml.TryGetFirst("PropertyGroup", out XMLNode propertyGroup);
-            propertyGroup.TryGetFirst("TargetFramework", out XMLNode tfm);
+            projectXml.TryGetFirstChild("PropertyGroup", out XMLNode propertyGroup);
+            propertyGroup.TryGetFirstChild("TargetFramework", out XMLNode tfm);
             tfm.Content.CopyFrom("net10.0");
             string str = projectXml.ToString();
             Console.WriteLine(str);
@@ -154,9 +154,9 @@ namespace Serialization.Tests
         public void SkipEmptyNodes()
         {
             using XMLNode node = new("Root");
-            node.Add(new("Name", "Boa"));
-            node.Add(new("Type", "Box"));
-            node.Add(new("Empty"));
+            node.AddChild(new("Name", "Boa"));
+            node.AddChild(new("Type", "Box"));
+            node.AddChild(new("Empty"));
 
             SerializationSettings settings = SerializationSettings.PrettyPrinted;
             settings.flags |= SerializationSettings.Flags.SkipEmptyNodes;

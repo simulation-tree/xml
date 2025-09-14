@@ -491,15 +491,57 @@ namespace XML
         /// <summary>
         /// Adds the given <paramref name="child"/> node to the list of children.
         /// </summary>
-        public readonly void Add(XMLNode child)
+        public readonly void AddChild(XMLNode child)
         {
             children.Add(child);
         }
 
         /// <summary>
+        /// Tries to remove the first child node with the given <paramref name="name"/>.
+        /// </summary>
+        public readonly bool TryRemoveChild(ReadOnlySpan<char> name)
+        {
+            Span<XMLNode> childrenSpan = children.AsSpan();
+            for (int i = 0; i < childrenSpan.Length; i++)
+            {
+                XMLNode childNode = childrenSpan[i];
+                if (childNode.Name.Equals(name))
+                {
+                    children.RemoveAt(i, out XMLNode removed);
+                    removed.Dispose();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Removes the child node at the given <paramref name="index"/>.
         /// </summary>
-        public readonly void RemoveAt(int index, out XMLNode removed)
+        public readonly void RemoveChildAt(int index)
+        {
+            children.RemoveAt(index, out XMLNode removed);
+            removed.Dispose();
+        }
+
+        /// <summary>
+        /// Removes the child node at the given <paramref name="index"/>.
+        /// by swapping it with the last element in the list.
+        /// </summary>
+        public readonly void RemoveChildAtBySwapping(int index)
+        {
+            children.RemoveAtBySwapping(index, out XMLNode removed);
+            removed.Dispose();
+        }
+
+        /// <summary>
+        /// Removes the child node at the given <paramref name="index"/>.
+        /// <para>
+        /// The <paramref name="removed"/> node must be disposed of by the caller.
+        /// </para>
+        /// </summary>
+        public readonly void RemoveChildAt(int index, out XMLNode removed)
         {
             children.RemoveAt(index, out removed);
         }
@@ -507,16 +549,23 @@ namespace XML
         /// <summary>
         /// Removes the child node at the given <paramref name="index"/>.
         /// by swapping it with the last element in the list.
+        /// <para>
+        /// The <paramref name="removed"/> node must be disposed of by the caller.
+        /// </para>
         /// </summary>
-        public readonly void RemoveAtBySwapping(int index, out XMLNode removed)
+        public readonly void RemoveChildAtBySwapping(int index, out XMLNode removed)
         {
             children.RemoveAtBySwapping(index, out removed);
         }
 
         /// <summary>
         /// Tries to remove the given <paramref name="node"/> from the list of children.
+        /// <para>
+        /// The given <paramref name="node"/> must be disposed of by the caller
+        /// if this method returns <see langword="true"/>.
+        /// </para>
         /// </summary>
-        public readonly bool TryRemove(XMLNode node)
+        public readonly bool TryRemoveChild(XMLNode node)
         {
             return children.TryRemove(node);
         }
@@ -524,8 +573,12 @@ namespace XML
         /// <summary>
         /// Tries to remove the given <paramref name="node"/> from the list of children
         /// by swapping it with the last element in the list.
+        /// <para>
+        /// The given <paramref name="node"/> must be disposed of by the caller
+        /// if this method returns <see langword="true"/>.
+        /// </para>
         /// </summary>
-        public readonly bool TryRemoveBySwapping(XMLNode node)
+        public readonly bool TryRemoveChildBySwapping(XMLNode node)
         {
             return children.TryRemoveBySwapping(node);
         }
@@ -533,7 +586,7 @@ namespace XML
         /// <summary>
         /// Retrieves the index of the given <paramref name="node"/> in the list of children.
         /// </summary>
-        public readonly int IndexOf(XMLNode node)
+        public readonly int IndexOfChild(XMLNode node)
         {
             return children.IndexOf(node);
         }
@@ -542,7 +595,7 @@ namespace XML
         /// Tries to retrieve the index of the given <paramref name="node"/> in the list of children.
         /// </summary>
         /// <returns><see langword="true"/> if the node is contained.</returns>
-        public readonly bool TryIndexOf(XMLNode node, out int index)
+        public readonly bool TryIndexOfChild(XMLNode node, out int index)
         {
             return children.TryIndexOf(node, out index);
         }
@@ -587,7 +640,7 @@ namespace XML
         /// <summary>
         /// Retrieves the first child node with the given <paramref name="name"/>.
         /// </summary>
-        public readonly XMLNode GetFirst(ReadOnlySpan<char> name)
+        public readonly XMLNode GetFirstChild(ReadOnlySpan<char> name)
         {
             Span<XMLNode> childrenSpan = children.AsSpan();
             for (int i = 0; i < childrenSpan.Length; i++)
@@ -605,16 +658,16 @@ namespace XML
         /// <summary>
         /// Retrieves the first child node with the given <paramref name="name"/>.
         /// </summary>
-        public readonly XMLNode GetFirst(string name)
+        public readonly XMLNode GetFirstChild(string name)
         {
-            return GetFirst(name.AsSpan());
+            return GetFirstChild(name.AsSpan());
         }
 
         /// <summary>
         /// Tries to retrieve the first child node with the given <paramref name="name"/>.
         /// </summary>
         /// <returns><see langword="true"/> if a node was found.</returns>
-        public readonly bool TryGetFirst(ReadOnlySpan<char> name, out XMLNode foundChildNode)
+        public readonly bool TryGetFirstChild(ReadOnlySpan<char> name, out XMLNode foundChildNode)
         {
             Span<XMLNode> childrenSpan = children.AsSpan();
             for (int i = 0; i < childrenSpan.Length; i++)
@@ -635,9 +688,9 @@ namespace XML
         /// Tries to retrieve the first child node with the given <paramref name="name"/>.
         /// </summary>
         /// <returns><see langword="true"/> if a node was found.</returns>
-        public readonly bool TryGetFirst(string name, out XMLNode foundChildNode)
+        public readonly bool TryGetFirstChild(string name, out XMLNode foundChildNode)
         {
-            return TryGetFirst(name.AsSpan(), out foundChildNode);
+            return TryGetFirstChild(name.AsSpan(), out foundChildNode);
         }
 
         /// <summary>
@@ -773,7 +826,7 @@ namespace XML
         /// Sets or adds a new attribute or assigns an existing one to the given value.
         /// </summary>
         /// <returns><see langword="true"/> if it was created, otherwise it was set</returns>
-        public readonly bool SetAttribute(ReadOnlySpan<char> name, ReadOnlySpan<char> value)
+        public readonly bool SetOrAddAttribute(ReadOnlySpan<char> name, ReadOnlySpan<char> value)
         {
             Span<XMLAttribute> attributesSpan = attributes.AsSpan();
             for (int i = 0; i < attributesSpan.Length; i++)
@@ -795,9 +848,9 @@ namespace XML
         /// Sets or adds a new attribute or assigns an existing one to the given value.
         /// </summary>
         /// <returns><see langword="true"/> if it was created, otherwise it was set</returns>
-        public readonly bool SetAttribute(string name, ReadOnlySpan<char> value)
+        public readonly bool SetOrAddAttribute(string name, ReadOnlySpan<char> value)
         {
-            return SetAttribute(name.AsSpan(), value);
+            return SetOrAddAttribute(name.AsSpan(), value);
         }
 
         /// <summary>
