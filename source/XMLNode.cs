@@ -227,12 +227,9 @@ namespace XML
             return str;
         }
 
-        readonly void ISerializable.Write(ByteWriter writer)
+        readonly void ISerializable.Write(ByteWriter byteWriter)
         {
-            Text buffer = new(0);
-            ToString(buffer, SerializationSettings.PrettyPrinted, 0);
-            writer.WriteSpan(buffer.AsSpan());
-            buffer.Dispose();
+            Write(byteWriter, SerializationSettings.PrettyPrinted);
         }
 
         /// <summary>
@@ -243,18 +240,18 @@ namespace XML
         {
             Text buffer = new(0);
             ToString(buffer, settings, 0);
-            writer.WriteSpan(buffer.AsSpan());
+            writer.WriteUTF8(buffer.AsSpan());
             buffer.Dispose();
         }
 
         [SkipLocalsInit]
-        void ISerializable.Read(ByteReader reader)
+        void ISerializable.Read(ByteReader byteReader)
         {
             attributes = new(4);
             content = new(0);
             children = new(4);
 
-            XMLReader xmlReader = new(reader);
+            XMLReader xmlReader = new(byteReader);
             Token token = xmlReader.ReadToken(); //<
 
             if (xmlReader.TryPeekToken(out Token nextToken) && nextToken.type == Token.Type.Prologue)
@@ -333,7 +330,7 @@ namespace XML
                             }
                         }
 
-                        reader.Position -= token.length;
+                        byteReader.Position -= token.length;
                         XMLNode child = xmlReader.ReadNode();
                         children.Add(child);
                     }
@@ -341,9 +338,9 @@ namespace XML
                     {
                         using Text temp = new(token.length);
                         Span<char> tempSpan = temp.AsSpan();
-                        int written = reader.PeekUTF8(token.position, token.length, tempSpan);
+                        int written = byteReader.PeekUTF8(token.position, token.length, tempSpan);
                         content.Append(tempSpan.Slice(0, written));
-                        reader.Position = token.position + token.length;
+                        byteReader.Position = token.position + token.length;
                     }
 
                     if (xmlReader.TryPeekToken(out Token next) && next.type == Token.Type.Open)

@@ -61,6 +61,27 @@ namespace Serialization.Tests
         }
 
         [Test]
+        public void WriteNodesAndSerializeToBytes()
+        {
+            SerializationSettings settings = SerializationSettings.PrettyPrinted;
+            using XMLNode node = new("Solution");
+            XMLNode project1 = new("Project");
+            project1.SetOrAddAttribute("Name", "MyProject");
+            project1.SetOrAddAttribute("Path", "source/MyProject.csproj");
+            node.AddChild(project1);
+            XMLNode project2 = new("Project");
+            project2.SetOrAddAttribute("Name", "MyOtherProject");
+            project2.SetOrAddAttribute("Path", "source/MyOtherProject.csproj");
+            node.AddChild(project2);
+            string str = node.ToString(settings);
+
+            using ByteWriter writer = new();
+            node.Write(writer, settings);
+            ReadOnlySpan<byte> bytes = writer.AsSpan();
+            Assert.That(System.Text.Encoding.UTF8.GetString(bytes), Is.EqualTo(str));
+        }
+
+        [Test]
         public void EmptyNode()
         {
             const string Sample = "<Apple><PackageId/></Apple>";
