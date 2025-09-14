@@ -140,11 +140,17 @@ namespace Serialization.Tests
         [Test]
         public void DeserializeFromBinary()
         {
-            using ByteReader reader = ByteReader.CreateFromUTF8(XMLDummy);
-            ReadOnlySpan<byte> byteStream = reader.GetBytes();
-            using XMLNode projectXml = reader.ReadObject<XMLNode>();
+            using XMLNode projectXml = XMLNode.Parse(XMLDummy);
             string str = projectXml.ToString();
-            Console.WriteLine(str);
+
+            Assert.That(projectXml.ContainsAttribute("Sdk"), Is.True);
+            Assert.That(projectXml.ContainsChild("PropertyGroup"), Is.True);
+
+            XMLNode propertyGroup = projectXml.GetFirstChild("PropertyGroup");
+            Assert.That(propertyGroup.ContainsChild("OutputType"), Is.True);
+            Assert.That(propertyGroup.GetFirstChild("OutputType").Content.ToString(), Is.EqualTo("Exe"));
+            Assert.That(propertyGroup.ContainsChild("TargetFramework"), Is.True);
+            Assert.That(propertyGroup.GetFirstChild("TargetFramework").Content.ToString(), Is.EqualTo("net9.0"));
         }
 
         [Test]

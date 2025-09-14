@@ -768,6 +768,32 @@ namespace XML
         }
 
         /// <summary>
+        /// Checks if a child with the given <paramref name="name"/> exists.
+        /// </summary>
+        public readonly bool ContainsChild(ReadOnlySpan<char> name)
+        {
+            Span<XMLNode> childrenSpan = children.AsSpan();
+            for (int i = 0; i < childrenSpan.Length; i++)
+            {
+                XMLNode childNode = childrenSpan[i];
+                if (childNode.Name.Equals(name))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if a child with the given <paramref name="name"/> exists.
+        /// </summary>
+        public readonly bool ContainsChild(string name)
+        {
+            return ContainsChild(name.AsSpan());
+        }
+
+        /// <summary>
         /// Checks if an attribute with the given <paramref name="name"/> exists.
         /// </summary>
         public readonly bool ContainsAttribute(ReadOnlySpan<char> name)
@@ -917,6 +943,70 @@ namespace XML
             Text content = new(0);
             List<XMLNode> children = new(4);
             return new XMLNode(name, attributes, content, children, false);
+        }
+
+        /// <summary>
+        /// Parses the given <paramref name="xmlText"/> into an <see cref="XMLNode"/>.
+        /// </summary>
+        public static XMLNode Parse(ReadOnlySpan<char> xmlText)
+        {
+            using ByteReader byteReader = ByteReader.CreateFromUTF8(xmlText);
+            return byteReader.ReadObject<XMLNode>();
+        }
+
+        /// <summary>
+        /// Tries to parse the given <paramref name="xmlText"/> into an <see cref="XMLNode"/>.
+        /// </summary>
+        public static bool TryParse(ReadOnlySpan<char> xmlText, out XMLNode node)
+        {
+            node = default;
+            using ByteReader byteReader = ByteReader.CreateFromUTF8(xmlText);
+            try
+            {
+                node = byteReader.ReadObject<XMLNode>();
+            }
+            catch
+            {
+                if (node != default)
+                {
+                    node.Dispose();
+                    node = default;
+                }
+            }
+
+            return node != default;
+        }
+
+        /// <summary>
+        /// Parses the given <paramref name="xmlBytes"/> into an <see cref="XMLNode"/>.
+        /// </summary>
+        public static XMLNode Parse(ReadOnlySpan<byte> xmlBytes)
+        {
+            using ByteReader byteReader = new(xmlBytes);
+            return byteReader.ReadObject<XMLNode>();
+        }
+
+        /// <summary>
+        /// Tries to parse the given <paramref name="xmlBytes"/> into an <see cref="XMLNode"/>.
+        /// </summary>
+        public static bool TryParse(ReadOnlySpan<byte> xmlBytes, out XMLNode node)
+        {
+            node = default;
+            using ByteReader byteReader = new(xmlBytes);
+            try
+            {
+                node = byteReader.ReadObject<XMLNode>();
+            }
+            catch
+            {
+                if (node != default)
+                {
+                    node.Dispose();
+                    node = default;
+                }
+            }
+
+            return node != default;
         }
 
         /// <inheritdoc/>
